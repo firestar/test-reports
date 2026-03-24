@@ -85,6 +85,10 @@ public class AuditReportService {
     }
 
     public AuditReport transitionState(Long reportId, Long toStateId, String changedBy) {
+        return transitionState(reportId, toStateId, changedBy, null);
+    }
+
+    public AuditReport transitionState(Long reportId, Long toStateId, String changedBy, LocalDateTime changedAt) {
         AuditReport report = getReport(reportId);
         ReportState currentState = report.getCurrentState();
         ReportState toState = stateRepository.findById(toStateId)
@@ -95,6 +99,9 @@ public class AuditReportService {
                         "Transition from '" + currentState.getName() + "' to '" + toState.getName() + "' is not allowed"));
 
         ReportStateHistory history = new ReportStateHistory(report, currentState, toState, changedBy);
+        if (changedAt != null) {
+            history.setChangedAt(changedAt);
+        }
         historyRepository.save(history);
 
         report.setCurrentState(toState);

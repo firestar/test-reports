@@ -30,7 +30,9 @@ public class ReportStateHistory {
 
     @PrePersist
     protected void onCreate() {
-        this.changedAt = LocalDateTime.now();
+        if (this.changedAt == null) {
+            this.changedAt = LocalDateTime.now();
+        }
     }
 
     public ReportStateHistory() {}
