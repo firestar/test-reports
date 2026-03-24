@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Report Lifecycle Management</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Audit Reports</h2>
+            </div>
+            <ul class="nav-tabs">
+                <li class="nav-tab active" data-tab="queue">Queue</li>
+                <li class="nav-tab" data-tab="reports">All Reports</li>
+                <li class="nav-tab" data-tab="editors">Editors</li>
+                <li class="nav-tab" data-tab="settings">Settings</li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <!-- Queue Tab -->
+            <div id="tab-queue" class="tab-panel active">
+                <div class="panel-header">
+                    <h1>Report Queue</h1>
+                    <button class="btn btn-primary" onclick="showCreateReportModal()">+ New Report</button>
+                </div>
+                <table class="data-table" id="queue-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Region</th>
+                            <th>Type</th>
+                            <th>Year</th>
+                            <th>Path</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- All Reports Tab -->
+            <div id="tab-reports" class="tab-panel">
+                <div class="panel-header">
+                    <h1>All Reports</h1>
+                    <div class="filters">
+                        <select id="filter-state" onchange="loadReports()">
+                            <option value="">All States</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="data-table" id="reports-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Region</th>
+                            <th>State</th>
+                            <th>Editor</th>
+                            <th>Days Assigned</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Editors Tab -->
+            <div id="tab-editors" class="tab-panel">
+                <div class="panel-header">
+                    <h1>Editors</h1>
+                    <button class="btn btn-primary" onclick="showCreateEditorModal()">+ New Editor</button>
+                </div>
+                <div id="editors-list" class="card-grid"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-panel">
+                <div class="panel-header">
+                    <h1>Workflow Settings</h1>
+                </div>
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <h2>States</h2>
+                        <button class="btn btn-primary btn-sm" onclick="showCreateStateModal()">+ Add State</button>
+                        <table class="data-table" id="states-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Name</th>
+                                    <th>Initial</th>
+                                    <th>Terminal</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="settings-section">
+                        <h2>Allowed Transitions</h2>
+                        <button class="btn btn-primary btn-sm" onclick="showCreateTransitionModal()">+ Add Transition</button>
+                        <table class="data-table" id="transitions-table">
+                            <thead>
+                                <tr>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
