@@ -33,7 +33,5 @@ loadBalancer:
   type: none
 
 environments:
-  development:
-    namespace: test-reports-dev
   production:
-    namespace: test-reports-prod
+    namespace: project-manager
