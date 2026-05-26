@@ -1,23 +1,17 @@
 version: 1
 
-# Kaiad pipeline for audit-reports: build the root Dockerfile and deploy
-# the resulting image. Kaiad runs `docker build` on the host daemon,
-# pushes the image to its built-in registry, and deploys to every bound
-# agent.
-#
-# Adjust as needed:
-#   - ports:        the container's listening port(s) (source of truth)
-#   - domains:      external host(s) routed to a port (needs an LB type)
-#   - loadBalancer: none | metallb | k8s | nginx
-#   - environments: per-environment namespace / overrides
-# Full reference: https://kaiad.dev/reference/pipeline.html
+# Kaiad pipeline for the projman Java service. Kaiad runs `docker build`
+# on the host daemon, pushes the image to its built-in registry, and
+# deploys to every bound agent. Full reference:
+# https://kaiad.dev/reference/pipeline.html
 #
 # Persistence: the application writes its SQLite database to
 # /data/projman.db. Kaiad mounts a shared persistent volume at /data for
 # every container in the cluster, so the file survives pod restarts as
-# long as that mount is in place. If you ever deploy this image outside
-# kaiad, bind-mount or PVC-mount a persistent volume at /data — the
-# Dockerfile already declares VOLUME ["/data"].
+# long as that mount is in place (the pipeline schema does not expose a
+# volumes: stanza — it's provided at the agent/cluster level). The
+# Dockerfile also declares VOLUME ["/data"] so the image is portable
+# outside kaiad.
 
 dockerfile:
   path: Dockerfile
@@ -27,10 +21,19 @@ ports:
   - port: 8080
     name: http
 
+# Public hostname. The production environment inherits this default.
+domains:
+  - host: projman.org
+    port: 8080
+    protocol: https
+
 instances: 1
 
+# ingress-nginx terminates TLS at the edge; the JVM speaks plain HTTP on
+# 8080 inside the pod. Provide a pre-existing TLS Secret via tlsSecret:
+# (or rely on cert-manager) once a cert for projman.org is provisioned.
 loadBalancer:
-  type: none
+  type: nginx
 
 environments:
   production:
