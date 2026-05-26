@@ -118,7 +118,9 @@ async function showReportDetail(id) {
 
     // Allowed transitions
     if (transitions.length > 0) {
-        html += '<h3 style="margin-top:16px">Transition</h3><div style="display:flex;gap:8px;flex-wrap:wrap">';
+        html += '<h3 style="margin-top:16px">Transition</h3>';
+        html += '<div class="form-group" style="margin-bottom:8px"><label>Transition Date (optional)</label><input type="datetime-local" id="transition-date" class="transition-date-input"></div>';
+        html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
         transitions.forEach(t => {
             html += `<button class="btn btn-primary btn-sm" onclick="doTransition(${report.id}, ${t.toState.id})">&rarr; ${esc(t.toState.name)}</button>`;
         });
@@ -129,10 +131,15 @@ async function showReportDetail(id) {
 }
 
 async function doTransition(reportId, toStateId) {
+    const dateInput = document.getElementById('transition-date');
+    const payload = {toStateId: toStateId, changedBy: 'admin'};
+    if (dateInput && dateInput.value) {
+        payload.changedAt = dateInput.value;
+    }
     const resp = await fetch(API + '/api/reports/' + reportId + '/transition', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({toStateId: toStateId, changedBy: 'admin'})
+        body: JSON.stringify(payload)
     });
     if (resp.ok) {
         closeModal();

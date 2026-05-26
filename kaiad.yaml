@@ -1,0 +1,53 @@
+version: 1
+
+# Kaiad pipeline for the projman Java service. Builds a Spring Boot fat
+# JAR with Maven, then layers it onto a minimal JRE runtime image.
+# Full reference: https://kaiad.dev/reference/pipeline.html
+#
+# Persistence: the application writes its SQLite database to
+# /data/projman.db. Kaiad mounts a shared persistent volume at /data for
+# every container in the cluster, so the file survives pod restarts as
+# long as that mount is in place (the pipeline schema does not expose a
+# volumes: stanza — it's provided at the agent/cluster level).
+
+build:
+  image: maven:3.9-eclipse-temurin-17
+  steps:
+    - mvn -B -DskipTests package
+    - cp target/*.jar /artifacts/app.jar
+
+artifacts:
+  - app.jar
+
+runtime:
+  image: eclipse-temurin:17-jre
+  copy:
+    - from: app.jar
+      to: /app/app.jar
+  command:
+    - java
+    - -XX:MaxRAMPercentage=75
+    - -jar
+    - /app/app.jar
+
+ports:
+  - port: 8080
+    name: http
+
+# Public hostname. The production environment inherits this default.
+domains:
+  - host: projman.org
+    port: 8080
+    protocol: https
+
+instances: 1
+
+# ingress-nginx terminates TLS at the edge; the JVM speaks plain HTTP on
+# 8080 inside the pod. Provide a pre-existing TLS Secret via tlsSecret:
+# (or rely on cert-manager) once a cert for projman.org is provisioned.
+loadBalancer:
+  type: nginx
+
+environments:
+  production:
+    namespace: project-manager

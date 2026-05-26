@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -69,7 +70,11 @@ public class AuditReportController {
     public ResponseEntity<AuditReport> transitionState(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Long toStateId = ((Number) body.get("toStateId")).longValue();
         String changedBy = (String) body.getOrDefault("changedBy", "user");
-        return ResponseEntity.ok(reportService.transitionState(id, toStateId, changedBy));
+        LocalDateTime changedAt = null;
+        if (body.containsKey("changedAt") && body.get("changedAt") != null) {
+            changedAt = LocalDateTime.parse((String) body.get("changedAt"));
+        }
+        return ResponseEntity.ok(reportService.transitionState(id, toStateId, changedBy, changedAt));
     }
 
     @GetMapping("/{id}/history")
