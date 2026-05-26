@@ -11,6 +11,13 @@ version: 1
 #   - loadBalancer: none | metallb | k8s | nginx
 #   - environments: per-environment namespace / overrides
 # Full reference: https://kaiad.dev/reference/pipeline.html
+#
+# Persistence: the application writes its SQLite database to
+# /data/projman.db. Kaiad mounts a shared persistent volume at /data for
+# every container in the cluster, so the file survives pod restarts as
+# long as that mount is in place. If you ever deploy this image outside
+# kaiad, bind-mount or PVC-mount a persistent volume at /data — the
+# Dockerfile already declares VOLUME ["/data"].
 
 dockerfile:
   path: Dockerfile
