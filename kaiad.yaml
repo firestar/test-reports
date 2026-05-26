@@ -25,10 +25,9 @@ runtime:
     - from: app.jar
       to: /app/app.jar
   command:
-    - java
-    - -XX:MaxRAMPercentage=75
-    - -jar
-    - /app/app.jar
+    - sh
+    - -c
+    - mkdir -p /data && exec java -XX:MaxRAMPercentage=75 -jar /app/app.jar
 
 ports:
   - port: 8080
